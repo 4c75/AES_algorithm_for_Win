@@ -23,23 +23,23 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		if (last_block_starts>i)//for blocks who are full of values
 		{
-			for (int j = i; j < i + 16; j++)
+			for (int j = 0; j+i < i + 16; j++)
 				{
 					text_fragment[j] = crypto_text[i+j];
 				};
-					text_fragment[i + 16] = '\0';
+					text_fragment[16] = '\0';
 		}
 		else //for last block, who isnt full of values
 		{
-			for (int j=i; j<j+last_block_element_count; j++)
+			for (int j=0; j<=last_block_element_count; j++)
 			{
 				text_fragment[j] = crypto_text[j + i];
 			}
-			for (int j = i + last_block_element_count; j < length_plain_text; j++)
+			for (int j = 0 + last_block_element_count; j <= 16; j++)
 			{
 				text_fragment[j] = '0';
 			}
-			text_fragment[i + 16] = '\0';
+			text_fragment[16] = '\0';
 		}
 
 		//rest of operations
