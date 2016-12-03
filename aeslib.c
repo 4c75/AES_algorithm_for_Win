@@ -49,18 +49,18 @@ void AddRoundKey(char *state, char *round_key)
 //    }*/
 //}
 
-// pass just 4x4 arrays, pls
+// pass just 16 size arrays, pls
 /*We swap char with it's S-Box value
 (The first 4 bits in the byte (the first hexadecimal value, hence) individuate the row,
 the last 4 bits individuate the column) in Rijndael S-Box*/
-void SubBtyes(char **state)
+void SubBtyes(char *state)
 {
     int i = 0, j = 0;
     for(; i<4; i++){
         for(; j<4; j++){
-            unsigned char first_4_bits = state[i][j] >> 4; //shift all bits 4 indexes to right;
-            unsigned char last_4_bits = state[i][j] & 0x0f; //logical and with 00001111;
-            state[i][j] = Rijndael_S_box[first_4_bits * 16 + last_4_bits]; //means [first_4_bits][last_4_bits]
+            unsigned char first_4_bits = state[i*4 +j] >> 4; //shift all bits 4 indexes to right;
+            unsigned char last_4_bits = state[i*4 +j] & 0x0f; //logical and with 00001111;
+            state[i*4 +j] = Rijndael_S_box[first_4_bits * 16 + last_4_bits]; //means [first_4_bits][last_4_bits]
         }
     }
     /*for(int i=0; i<4; i++){
@@ -70,16 +70,16 @@ void SubBtyes(char **state)
     }*/
 }
 
-// again - pass just 4x4 array, pls - [rows][columns]
-void ShiftRows(char **state)
+// again - pass just 16 array, pls - [rows][columns]
+void ShiftRows(char *state)
 {
     int row = 1, col = 1;
     for(; row<4; row++){
-        char remember = state[row][0];
+        char remember = state[row *4+ 0];
         for(1; col<4; col++){
-            state[row][col-1] = state[row][col];
+            state[row *4+ (col-1)] = state[row *4+ col];
         }
-    state[row][3] = remember;
+    state[row*4 + 3] = remember;
     }
 }
 
