@@ -10,6 +10,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	char r;
 	cin >> r;
+	system("pause");
 	return 0;
 }
 
