@@ -26,6 +26,7 @@ static unsigned char Rijndael_S_box[256] =
 	0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
  };
 
+
 void AddRoundKey(char *state, char *round_key)
 {
     for(int i=0; i < 16; i++)
@@ -74,11 +75,16 @@ void ShiftRows(char *state)
 	};
 };
 
-//TODO
+
 void MixColumns(char *state)
 {
-   // 2113321113211132
-	return;
+	for (int i = 0; i < 16; i=i+4)
+	{
+		state[i] = 2 * state[i] + 3 * state[i + 1] + state[i + 2] + state[i + 3];
+		state[i+1]= 1 * state[i] + 2 * state[i + 1] + 3 * state[i + 2] + state[i + 3];
+		state[i+2]= 1 * state[i] + 1 * state[i + 1] + 2 * state[i + 2] + 3 * state[i + 3];
+		state[i+3]= 3 * state[i] + 1 * state[i + 1] + state[i + 2] + 2 * state[i + 3];
+	};
 };
 
 void Rot_Word(char* word)
