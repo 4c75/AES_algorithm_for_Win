@@ -18,7 +18,7 @@ static unsigned char Rijndael_S_box[256] =
 	0x51, 0xA3, 0x40, 0x8F, 0x92, 0x9D, 0x38, 0xF5, 0xBC, 0xB6, 0xDA, 0x21, 0x10, 0xFF, 0xF3, 0xD2,
 	0xCD, 0x0C, 0x13, 0xEC, 0x5F, 0x97, 0x44, 0x17, 0xC4, 0xA7, 0x7E, 0x3D, 0x64, 0x5D, 0x19, 0x73,
 	0x60, 0x81, 0x4F, 0xDC, 0x22, 0x2A, 0x90, 0x88, 0x46, 0xEE, 0xB8, 0x14, 0xDE, 0x5E, 0x0B, 0xDB,
-	0xE0, 0x32, 0x3A, 0x0A, 0x49, 0x06, 0x24, 0x5C, 0xC2, 0xD3, 0xAC, 0x62, 0x91, 0x95, 0xE4, 0x79,
+	0xE0, 0x32, 0x3A, 0x0A, 0x49, 0x06, 0x24, 0x5C, 0xC2, 0xD3, 0xAC, 0x62, 0x9 1, 0x95, 0xE4, 0x79,
 	0xE7, 0xC8, 0x37, 0x6D, 0x8D, 0xD5, 0x4E, 0xA9, 0x6C, 0x56, 0xF4, 0xEA, 0x65, 0x7A, 0xAE, 0x08,
 	0xBA, 0x78, 0x25, 0x2E, 0x1C, 0xA6, 0xB4, 0xC6, 0xE8, 0xDD, 0x74, 0x1F, 0x4B, 0xBD, 0x8B, 0x8A,
 	0x70, 0x3E, 0xB5, 0x66, 0x48, 0x03, 0xF6, 0x0E, 0x61, 0x35, 0x57, 0xB9, 0x86, 0xC1, 0x1D, 0x9E,
@@ -77,12 +77,31 @@ void ShiftRows(char *state)
 //TODO
 void MixColumns(char *state)
 {
-    
+   // 2113321113211132
 	return;
+};
+
+void Rot_Word(char* word)
+{
+	char* temp;
+	temp = word[1];
+	word[1] = word[4];
+	word[4] = temp;
+	temp = word[2];
+	word[2] = word[3];
+	word[3] = temp;
 };
 
 void getRoundKey(char *key, char* round_key) //need to make round key generator
 {
+	char* temp;
+	//Take 4 elements from first key and do a 
+	temp[1] = key[11]; 
+	temp[2] = key[12];
+	temp[3] = key[13];
+	temp[4] = key[14];
+	Rot_Word(temp);
+	//subbyte
 
 	return;
 
@@ -91,38 +110,41 @@ void getRoundKey(char *key, char* round_key) //need to make round key generator
 void encrypt_AES(char *state, char* key)
 {
 	char *round_key;
+	char *prew_round_key;
 	AddRoundKey(state, key);
-	round_key = key;
+	prew_round_key = key;
 	for(int i=0; i<9 ;i++){
         SubBtyes(state); //will need to check
         ShiftRows(state); //will need to check
         MixColumns(state);
-		getRoundKey(key, round_key);
+		getRoundKey(prew_round_key, round_key);
         AddRoundKey(state, round_key);
+		prew_round_key = round_key;
 	};
     SubBtyes(state);
     ShiftRows(state);
-	getRoundKey(key, round_key);
-    AddRoundKey(state, key);
+	getRoundKey(prew_round_key, round_key);
+    AddRoundKey(prew_round_key, round_key);
 };
 
 void decrypt_AES(char * state, char *key)
 {
 	char *round_key;
-	round_key = key;
+	char *prew_round_key;
 	AddRoundKey(state, key);
+	prew_round_key = key;
 	for (int i = 0; i<9; i++) {
 		
 		ShiftRows(state); //need to make inverse
 		SubBtyes(state); //need to make inverse
-		getRoundKey(key, round_key);
-		AddRoundKey(state, key);
+		getRoundKey(prew_round_key, round_key);
+		AddRoundKey(state, round_key);
 		MixColumns(state); //inverse
-		
+		prew_round_key =round_key;
 	};
 	ShiftRows(state);//need to make inverse
 	SubBtyes(state);//need to make inverse
-	getRoundKey(key, round_key);
-	AddRoundKey(state, key);
+	getRoundKey(prew_round_key, round_key);
+	AddRoundKey(state, round_key);
 };
 
