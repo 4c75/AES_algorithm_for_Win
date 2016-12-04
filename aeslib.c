@@ -92,30 +92,33 @@ void ShiftRows_inversed(char *state)
 
 void MixColumns(char *state)  
 {
-	for (int i = 0; i < 16; i=i+4)
+	for (int i = 0; i < 16; i=i+4)	//read somewhere that there should be some kind of check for multyplying ???
 	{
-		state[i] = 02 * state[i] + 03 * state[i + 4] + 01* state[i + 8] + 01 * state[i + 12];
-		state[i+1]= 01 * state[i] + 02 * state[i + 4] + 03 * state[i + 8] + 01 * state[i + 12];
-		state[i+2]= 01 * state[i] + 01 * state[i + 4] + 02 * state[i + 8] + 03 * state[i + 12];
-		state[i+3]= 03 * state[i] + 01 * state[i + 4] + 01 * state[i + 8] + 02 * state[i + 12];
+		state[i] = 02 * state[i] ^ 03 * state[i + 4] ^ 01 * state[i + 8] ^ 01 * state[i + 12];	//XOR counts as +
+		state[i+1]= 01 * state[i] ^ 02 * state[i + 4] ^ 03 * state[i + 8] ^ 01 * state[i + 12];
+		state[i+2]= 01 * state[i] ^ 01 * state[i + 4] ^ 02 * state[i + 8] ^ 03 * state[i + 12];
+		state[i+3]= 03 * state[i] ^ 01 * state[i + 4] ^ 01 * state[i + 8] ^ 02 * state[i + 12];
 	};
 };
 
 
-/*
-0E 0B 0D 09
-09 0E 0B 0D
-0D 09 0E 0B
-0B 0D 09 0E
-*/
-void MixColumns_inversed(char *state)//work in progress
+
+void MixColumns_inversed(char *state)
 {
+	/*	For vertiba
+	0E 0B 0D 09
+	09 0E 0B 0D
+	0D 09 0E 0B
+	0B 0D 09 0E
+	*/
+	char * vertiba= "EBD99EBDD9EBBD9E";
+
 	for (int i = 0; i < 16; i = i + 4)
 	{
-		state[i] = 1;
-		state[i + 1] = 1;
-		state[i + 2] = 1;
-		state[i + 3] = 1;
+		state[i] = vertiba[0] * state[i] ^ vertiba[1] * state[i + 4] ^ vertiba[2] * state[i + 8] ^ vertiba[3] * state[i + 12];
+		state[i + 1] = vertiba[4] * state[i] ^ vertiba[5] * state[i + 4] ^ vertiba[6] * state[i + 8] ^ vertiba[7] * state[i + 12];
+		state[i + 2] = vertiba[8] * state[i] ^ vertiba[9] * state[i + 4] ^ vertiba[10] * state[i + 8] ^ vertiba[11] * state[i + 12];
+		state[i + 3] = vertiba[12] * state[i] ^ vertiba[13] * state[i + 4] ^ vertiba[14] * state[i + 8] ^ vertiba[15] * state[i + 12];
 	};
 };
 
@@ -129,6 +132,13 @@ void Rot_Word(char* word)
 	word[3] = temp[0];
 };
 
+
+/*	RCON
+[01]  [02]  [04]  [08]  [10]  [20]  [40]  [80]  [1b]  [36]
+[00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
+[00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
+[00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
+*/
 void XOR_column(char* prew_key, char* key, int column)
 {
 	//need to add another table, which will be added as another xor?   Rcon?
@@ -168,7 +178,7 @@ void getRoundKey(char *key, char* round_key)
 	temp[2] = key[13];
 	temp[3] = key[14];
 	Rot_Word(temp);  //Rot_word and subbyte and rot_column only for first column
-	//subbyte
+	//subbyte need to add
 	XOR_column(key, round_key, 1);
 	XOR_column(key, round_key, 2);
 	XOR_column(key, round_key, 3);
