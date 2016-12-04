@@ -85,19 +85,20 @@ void Rot_Word(char* word)
 {
 	char temp[1];
 	temp[1] = word[0];
-	word[0] = word[3];
-	word[3] = temp[1];
-	temp[1] = word[1];
+	word[0] = word[1];
 	word[1] = word[2];
-	word[2] = temp[1];
+	word[2] = word[3];
+	word[3] = temp[1];
 };
 
 void XOR_column(char* prew_key, char* key, int column)
 {
 	//need to add another table, which will be added as another xor?   Rcon?
+	//10x4   use 1 column in each round key (first round, first column...)
+	
 	switch (column)
 	{
-	case 1:					//Need to add xor part of rot_column
+	case 1:					//Need to add xor part of rot_column on in this case
 		key[0] = prew_key[0] ^ key[0];
 		key[1] = prew_key[1] ^ key[1];
 		key[2] = prew_key[2] ^ key[2];
@@ -120,7 +121,7 @@ void XOR_column(char* prew_key, char* key, int column)
 	}
 };
 
-void getRoundKey(char *key, char* round_key) //need to make round key generator
+void getRoundKey(char *key, char* round_key)
 {
 	char* temp="1234";
 	//Take 4 elements from first key (last column)
