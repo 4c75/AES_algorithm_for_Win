@@ -1,7 +1,3 @@
-
-
-int const matrix_size = 3; //4 elemtns each row, column
-
 //this is also nice:
 //https://www.lri.fr/~fmartignon/documenti/systemesecurite/5-AES.pdf
 
@@ -40,103 +36,63 @@ void AddRoundKey(char *state, char *round_key)
 	};
 };
 
-//// TODO
-//void AddRoundKey_(char **state, int state_size, char **round_key)
-//{
-//    /*int i = 0;
-//    for(; i < state_size; i++){
-//        state[i] ^= round_key[i];
-//    }*/
-//}
-
-// pass just 16 size arrays, pls
+// pass array of 16 elements
 /*We swap char with it's S-Box value
 (The first 4 bits in the byte (the first hexadecimal value, hence) individuate the row,
 the last 4 bits individuate the column) in Rijndael S-Box*/
 void SubBtyes(char *state)
 {
     int i = 0, j = 0;
-    for(; i<4; i++){
-        for(; j<4; j++){
+    for(; i<4; i++)
+	{
+        for(; j<4; j++)
+		{
             unsigned char first_4_bits = state[i*4 +j] >> 4; //shift all bits 4 indexes to right;
             unsigned char last_4_bits = state[i*4 +j] & 0x0f; //logical and with 00001111;
             state[i*4 +j] = Rijndael_S_box[first_4_bits * 16 + last_4_bits]; //means [first_4_bits][last_4_bits]
-        }
-    }
-    /*for(int i=0; i<4; i++){
-        for(int j=0; j<4; j++){
+		};
+	};
+    /*
+	for(int i=0; i<4; i++)
+	{
+       for(int j=0; j<4; j++)
+	   {
             state[i][j] = lookup[i][j]; // or make S function
-        }
+        };
     }*/
 }
 
-// again - pass just 16 array, pls - [rows][columns]
+// pass array of 16 elements
 void ShiftRows(char *state)
 {
     int row = 1, col = 1;
-    for(; row<4; row++){
+    for(; row<4; row++)
+	{
         char remember = state[row *4+ 0];
         for(1; col<4; col++){
             state[row *4+ (col-1)] = state[row *4+ col];
-        }
+		};
     state[row*4 + 3] = remember;
-    }
+	};
 }
 
 //TODO
-void MixColumns(char **state)
+void MixColumns(char *state)
 {
     return;
 }
 
-////TODO - improve?
-void AES(char **state, char* key)
-{
 
-	char ** text[3] [3];
-	char ** round_key[3][3];
-	//Was too lazy to thing for loop
-	//Puts text and keys into matrix, will be useful in future operations
-	text[0][0] = state[0];
-	text[0][1] = state[4];
-	text[0][2] = state[8];
-	text[0][3] = state[12];
-	text[1][0] = state[1];
-	text[1][1] = state[5];
-	text[1][2] = state[9];
-	text[1][3] = state[13];
-	text[2][0] = state[2];
-	text[2][1] = state[6];
-	text[2][2] = state[10];
-	text[2][3] = state[14];
-	text[3][0] = state[3];
-	text[3][1] = state[7];
-	text[3][2] = state[11];
-	text[3][3] = state[15]; 
-	round_key[0][0] = key[0];
-	round_key[0][1] = key[4];
-	round_key[0][2] = key[8];
-	round_key[0][3] = key[12];
-	round_key[1][0] = key[1];
-	round_key[1][1] = key[5];
-	round_key[1][2] = key[9];
-	round_key[1][3] = key[13];
-	round_key[2][0] = key[2];
-	round_key[2][1] = key[6];
-	round_key[2][2] = key[10];
-	round_key[2][3] = key[14];
-	round_key[3][0] = key[3];
-	round_key[3][1] = key[7];
-	round_key[3][2] = key[11];
-	round_key[3][3] = key[15];
+void AES(char *state, char* key)
+{
     for(int i=0; i<9 ;i++){
-        SubBtyes(state);
-        ShiftRows(state);
+        SubBtyes(state); //will need to check
+        ShiftRows(state); //will need to check
         MixColumns(state);
-        //AddRoundKey(state, Key_it);
+        AddRoundKey(state, key);
 	};
     SubBtyes(state);
     ShiftRows(state);
-    //AddRoundKey(state, Key_times);
+    AddRoundKey(state, key);
 };
 

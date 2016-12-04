@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "aeslib.c"
 #include <iostream>
 using namespace std;
 
@@ -43,6 +44,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		//rest of operations
+		AddRoundKey(text_fragment, key);
+		AES(text_fragment, key);
 		
 	};
 
