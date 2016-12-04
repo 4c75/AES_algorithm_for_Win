@@ -2,6 +2,8 @@
 
 int const matrix_size = 3; //4 elemtns each row, column
 
+//smthing - http://www.moserware.com/2009/09/stick-figure-guide-to-advanced.html
+
 //this is also nice:
 //https://www.lri.fr/~fmartignon/documenti/systemesecurite/5-AES.pdf
 
