@@ -71,7 +71,20 @@ void ShiftRows(char *state)
         for(1; col<4; col++){
             state[row *4+ (col-1)] = state[row *4+ col];
 		};
-    state[row*4 + 3] = remember;
+		state[row*4 + 3] = remember;
+	};
+};
+
+void ShiftRows_inversed(char *state)
+{
+	int row = 1, col = 2;
+	for (; row<4; row++)
+	{
+		char remember = state[row * 4 + 3];
+		for (; col<1; col--){
+			state[row * 4 + (col + 1)] = state[row * 4 + col];
+		};
+		state[row * 4 + 0] = remember;
 	};
 };
 
@@ -173,14 +186,14 @@ void decrypt_AES(char * state, char *key)
 	round_key = key;
 	for (int i = 0; i<9; i++) {
 		
-		ShiftRows(state); //need to make inverse
+		ShiftRows_inversed(state); // -> IS_IS correct?  need to make inverse
 		SubBtyes(state); //need to make inverse
 		getRoundKey(prew_round_key, round_key);
 		AddRoundKey(state, round_key);
 		MixColumns(state); //inverse
 		prew_round_key =round_key;
 	};
-	ShiftRows(state);//need to make inverse
+	ShiftRows_inversed(state);
 	SubBtyes(state);//need to make inverse
 	getRoundKey(prew_round_key, round_key);
 	AddRoundKey(state, round_key);
