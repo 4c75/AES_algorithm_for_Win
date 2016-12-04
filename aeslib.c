@@ -146,11 +146,34 @@ void Rot_Word(char* word)
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 */
-void XOR_column(char* prew_key, char* key, int column)
+void XOR_column(char* prew_key, char* key, int column, int round_number)
 {
 	//need to add another table, which will be added as another xor?   Rcon?
 	//10x4   use 1 column in each round key (first round, first column...)
-	
+	char * vertiba;
+	switch (round_number)
+	{
+	case 1:
+		vertiba = "01000000";
+	case 2:
+		vertiba = "02000000";
+	case 3:
+		vertiba = "04000000";
+	case 4:
+		vertiba = "08000000";
+	case 5:
+		vertiba = "10000000";
+	case 6:
+		vertiba = "20000000";
+	case 7:
+		vertiba = "40000000";
+	case 8:
+		vertiba = "80000000";
+	case 9:
+		vertiba = "1b000000";
+	case 10:
+		vertiba = "36000000";
+	}
 	switch (column)
 	{
 	case 1:					//Need to add xor part of rot_column on in this case
@@ -176,7 +199,7 @@ void XOR_column(char* prew_key, char* key, int column)
 	}
 };
 
-void getRoundKey(char *key, char* round_key)
+void getRoundKey(char *key, char* round_key, int round_number)
 {
 	char temp[]="1234";
 	//Take 4 elements from first key (last column)
@@ -186,10 +209,10 @@ void getRoundKey(char *key, char* round_key)
 	temp[3] = key[14];
 	Rot_Word(temp);  //Rot_word and subbyte and rot_column only for first column
 	//subbyte need to add
-	XOR_column(key, round_key, 1);
-	XOR_column(key, round_key, 2);
-	XOR_column(key, round_key, 3);
-	XOR_column(key, round_key, 4);
+	XOR_column(key, round_key, 1, round_number);
+	XOR_column(key, round_key, 2, round_number);
+	XOR_column(key, round_key, 3, round_number);
+	XOR_column(key, round_key, 4, round_number);
 };
 
 void encrypt_AES(char *state, char* key)
@@ -203,13 +226,13 @@ void encrypt_AES(char *state, char* key)
         SubBtyes(state); //will need to check
         ShiftRows(state); //will need to check
         MixColumns(state);
-		getRoundKey(prew_round_key, round_key);
+		getRoundKey(prew_round_key, round_key, i);
         AddRoundKey(state, round_key);
 		prew_round_key = round_key;
 	};
     SubBtyes(state);
     ShiftRows(state);
-	getRoundKey(prew_round_key, round_key);
+	getRoundKey(prew_round_key, round_key, 10);
     AddRoundKey(prew_round_key, round_key);
 };
 
@@ -224,14 +247,14 @@ void decrypt_AES(char * state, char *key)
 		
 		ShiftRows_inversed(state); // -> IS_IS correct?  need to make inverse
 		SubBtyes(state); //need to make inverse
-		getRoundKey(prew_round_key, round_key);
+		getRoundKey(prew_round_key, round_key, i);	//the question is should this go from 1 to 10 or from 10 to 1
 		AddRoundKey(state, round_key);
 		MixColumns(state); //inverse
 		prew_round_key =round_key;
 	};
 	ShiftRows_inversed(state);
 	SubBtyes(state);//need to make inverse
-	getRoundKey(prew_round_key, round_key);
+	getRoundKey(prew_round_key, round_key, 10);
 	AddRoundKey(state, round_key);
 };
 
