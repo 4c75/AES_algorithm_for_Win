@@ -89,12 +89,12 @@ void MixColumns(char *state)
 
 void Rot_Word(char* word)
 {
-	char temp[1];
-	temp[1] = word[0];
+	char temp[2];
+	temp[0] = word[0];
 	word[0] = word[1];
 	word[1] = word[2];
 	word[2] = word[3];
-	word[3] = temp[1];
+	word[3] = temp[0];
 };
 
 void XOR_column(char* prew_key, char* key, int column)
@@ -129,7 +129,7 @@ void XOR_column(char* prew_key, char* key, int column)
 
 void getRoundKey(char *key, char* round_key)
 {
-	char* temp="1234";
+	char temp[]="1234";
 	//Take 4 elements from first key (last column)
 	temp[0] = key[11]; 
 	temp[1] = key[12];
