@@ -92,12 +92,19 @@ void ShiftRows_inversed(char *state)
 
 void MixColumns(char *state)  
 {
+	/*
+	02 03 01 01
+	01 02 03 01
+	01 01 02 03
+	03 01 01 02
+	*/
+	char * vertiba = "2311123111233112";
 	for (int i = 0; i < 16; i=i+4)	//read somewhere that there should be some kind of check for multyplying ???
 	{
-		state[i] = 02 * state[i] ^ 03 * state[i + 4] ^ 01 * state[i + 8] ^ 01 * state[i + 12];	//XOR counts as +
-		state[i+1]= 01 * state[i] ^ 02 * state[i + 4] ^ 03 * state[i + 8] ^ 01 * state[i + 12];
-		state[i+2]= 01 * state[i] ^ 01 * state[i + 4] ^ 02 * state[i + 8] ^ 03 * state[i + 12];
-		state[i+3]= 03 * state[i] ^ 01 * state[i + 4] ^ 01 * state[i + 8] ^ 02 * state[i + 12];
+		state[i] = vertiba[0] * state[i] ^ vertiba[1] * state[i + 4] ^ vertiba[2] * state[i + 8] ^ vertiba[3] * state[i + 12];	//XOR counted as +
+		state[i + 1] = vertiba[4] * state[i] ^ vertiba[5] * state[i + 4] ^ vertiba[6] * state[i + 8] ^ vertiba[7] * state[i + 12];
+		state[i + 2] = vertiba[8] * state[i] ^ vertiba[9] * state[i + 4] ^ vertiba[10] * state[i + 8] ^ vertiba[11] * state[i + 12];
+		state[i + 3] = vertiba[12] * state[i] ^ vertiba[13] * state[i + 4] ^ vertiba[14] * state[i + 8] ^ vertiba[15] * state[i + 12];
 	};
 };
 
