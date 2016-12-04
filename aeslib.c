@@ -89,7 +89,13 @@ void ShiftRows_inversed(char *state)
 };
 
 
-void MixColumns(char *state)
+/*
+0E 0B 0D 09
+09 0E 0B 0D
+0D 09 0E 0B
+0B 0D 09 0E
+*/
+void MixColumns(char *state)  
 {
 	for (int i = 0; i < 16; i=i+4)
 	{
@@ -97,6 +103,17 @@ void MixColumns(char *state)
 		state[i+1]= 1 * state[i] + 2 * state[i + 1] + 3 * state[i + 2] + state[i + 3];
 		state[i+2]= 1 * state[i] + 1 * state[i + 1] + 2 * state[i + 2] + 3 * state[i + 3];
 		state[i+3]= 3 * state[i] + 1 * state[i + 1] + state[i + 2] + 2 * state[i + 3];
+	};
+};
+
+void MixColumns_inversed(char *state)//work in progress
+{
+	for (int i = 0; i < 16; i = i + 4)
+	{
+		state[i] = 1;
+		state[i + 1] = 1;
+		state[i + 2] = 1;
+		state[i + 3] = 1;
 	};
 };
 
