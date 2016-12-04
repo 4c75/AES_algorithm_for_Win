@@ -10,7 +10,7 @@ using namespace std;
 int _tmain(int argc, _TCHAR* argv[])
 {
 	char crypto_text[] = "Loti sarezgitais un sifretais teksts, kurs var but jebkada garuma";  //need to put option to insert different plain text
-	char key[] = "1234567887654321"; //need to put option to insert different key
+	char key[] = "2222222222222211"; //need to put option to insert different key
 	char rezult[2000]; //assume the longest result will be 2000char long
 	char text_fragment [17]; //place to  hold plain text fragments 16 + end symbol
 	int length_plain_text=0;
@@ -44,9 +44,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 
 		//rest of operations
-		AddRoundKey(text_fragment, key);
-		AES(text_fragment, key);
-		
+		encrypt_AES(text_fragment, key);
+		cout << text_fragment << endl;
+		decrypt_AES(text_fragment, key);
+		cout << text_fragment << endl;
 	};
 
 	system("pause");

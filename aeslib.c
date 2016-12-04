@@ -29,10 +29,9 @@ static unsigned char Rijndael_S_box[256] =
 
 void AddRoundKey(char *state, char *round_key)
 {
-	//There is no need to arrange them 4x4 matrix right now
     for(int i=0; i < 16; i++)
 	{
-        state[i] ^= round_key[i];
+        state[i] = state [i] ^ round_key[i];
 	};
 };
 
@@ -52,7 +51,7 @@ void SubBtyes(char *state)
             state[i*4 +j] = Rijndael_S_box[first_4_bits * 16 + last_4_bits]; //means [first_4_bits][last_4_bits]
 		};
 	};
-    /*
+    /*			//do we need this part of code?
 	for(int i=0; i<4; i++)
 	{
        for(int j=0; j<4; j++)
@@ -60,7 +59,7 @@ void SubBtyes(char *state)
             state[i][j] = lookup[i][j]; // or make S function
         };
     }*/
-}
+};
 
 // pass array of 16 elements
 void ShiftRows(char *state)
@@ -74,25 +73,57 @@ void ShiftRows(char *state)
 		};
     state[row*4 + 3] = remember;
 	};
-}
+};
 
 //TODO
 void MixColumns(char *state)
 {
-    return;
-}
+    
+	return;
+};
 
-
-void AES(char *state, char* key)
+void getRoundKey(char *key, char* round_key) //need to make round key generator
 {
-    for(int i=0; i<9 ;i++){
+
+	return;
+
+};
+
+void encrypt_AES(char *state, char* key)
+{
+	char *round_key;
+	AddRoundKey(state, key);
+	round_key = key;
+	for(int i=0; i<9 ;i++){
         SubBtyes(state); //will need to check
         ShiftRows(state); //will need to check
         MixColumns(state);
-        AddRoundKey(state, key);
+		getRoundKey(key, round_key);
+        AddRoundKey(state, round_key);
 	};
     SubBtyes(state);
     ShiftRows(state);
+	getRoundKey(key, round_key);
     AddRoundKey(state, key);
+};
+
+void decrypt_AES(char * state, char *key)
+{
+	char *round_key;
+	round_key = key;
+	AddRoundKey(state, key);
+	for (int i = 0; i<9; i++) {
+		
+		ShiftRows(state); //inverse
+		SubBtyes(state); //inverse
+		getRoundKey(key, round_key);
+		AddRoundKey(state, key);
+		MixColumns(state); //inverse
+		
+	};
+	ShiftRows(state);//inverse
+	SubBtyes(state);//inverse
+	getRoundKey(key, round_key);
+	AddRoundKey(state, key);
 };
 
