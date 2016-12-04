@@ -98,13 +98,13 @@ void MixColumns(char *state)
 	01 01 02 03
 	03 01 01 02
 	*/
-	char * vertiba = "2311123111233112";
+	
 	for (int i = 0; i < 16; i=i+4)	//read somewhere that there should be some kind of check for multyplying ???
 	{
-		state[i] = vertiba[0] * state[i] ^ vertiba[1] * state[i + 4] ^ vertiba[2] * state[i + 8] ^ vertiba[3] * state[i + 12];	//XOR counted as +
-		state[i + 1] = vertiba[4] * state[i] ^ vertiba[5] * state[i + 4] ^ vertiba[6] * state[i + 8] ^ vertiba[7] * state[i + 12];
-		state[i + 2] = vertiba[8] * state[i] ^ vertiba[9] * state[i + 4] ^ vertiba[10] * state[i + 8] ^ vertiba[11] * state[i + 12];
-		state[i + 3] = vertiba[12] * state[i] ^ vertiba[13] * state[i + 4] ^ vertiba[14] * state[i + 8] ^ vertiba[15] * state[i + 12];
+		state[i] = 0x02 * state[i] ^ 0x03 * state[i + 4] ^ 0x01 * state[i + 8] ^ 0x01 * state[i + 12];	//XOR counted as +
+		state[i + 1] = 0x01 * state[i] ^ 0x02 * state[i + 4] ^ 0x03 * state[i + 8] ^ 0x01 * state[i + 12];
+		state[i + 2] = 0x01 * state[i] ^ 0x01 * state[i + 4] ^ 0x02 * state[i + 8] ^ 0x03 * state[i + 12];
+		state[i + 3] = 0x03 * state[i] ^ 0x01 * state[i + 4] ^ 0x01 * state[i + 8] ^ 0x02 * state[i + 12];
 	};
 };
 
@@ -112,20 +112,18 @@ void MixColumns(char *state)
 
 void MixColumns_inversed(char *state)
 {
-	/*	For vertiba
+	/*
 	0E 0B 0D 09
 	09 0E 0B 0D
 	0D 09 0E 0B
 	0B 0D 09 0E
 	*/
-	char * vertiba= "EBD99EBDD9EBBD9E";
-
 	for (int i = 0; i < 16; i = i + 4)
 	{
-		state[i] = vertiba[0] * state[i] ^ vertiba[1] * state[i + 4] ^ vertiba[2] * state[i + 8] ^ vertiba[3] * state[i + 12];
-		state[i + 1] = vertiba[4] * state[i] ^ vertiba[5] * state[i + 4] ^ vertiba[6] * state[i + 8] ^ vertiba[7] * state[i + 12];
-		state[i + 2] = vertiba[8] * state[i] ^ vertiba[9] * state[i + 4] ^ vertiba[10] * state[i + 8] ^ vertiba[11] * state[i + 12];
-		state[i + 3] = vertiba[12] * state[i] ^ vertiba[13] * state[i + 4] ^ vertiba[14] * state[i + 8] ^ vertiba[15] * state[i + 12];
+		state[i] = 0x0E * state[i] ^ 0x0B * state[i + 4] ^ 0x0D * state[i + 8] ^ 0x09 * state[i + 12];
+		state[i + 1] = 0x09 * state[i] ^ 0x0E * state[i + 4] ^ 0x0B * state[i + 8] ^ 0x0D * state[i + 12];
+		state[i + 2] = 0x0D * state[i] ^ 0x09 * state[i + 4] ^ 0x0E * state[i + 8] ^ 0x0B * state[i + 12];
+		state[i + 3] = 0x0B * state[i] ^ 0x0D * state[i + 4] ^ 0x09 * state[i + 8] ^ 0x0E * state[i + 12];
 	};
 };
 
@@ -151,36 +149,37 @@ void XOR_column(char* prew_key, char* key, int column, int round_number)
 	//need to add another table, which will be added as another xor?   Rcon?
 	//10x4   use 1 column in each round key (first round, first column...)
 	char * vertiba;
-	switch (round_number)
-	{
-	case 1:
-		vertiba = "01000000";
-	case 2:
-		vertiba = "02000000";
-	case 3:
-		vertiba = "04000000";
-	case 4:
-		vertiba = "08000000";
-	case 5:
-		vertiba = "10000000";
-	case 6:
-		vertiba = "20000000";
-	case 7:
-		vertiba = "40000000";
-	case 8:
-		vertiba = "80000000";
-	case 9:
-		vertiba = "1b000000";
-	case 10:
-		vertiba = "36000000";
-	}
 	switch (column)
 	{
-	case 1:					//Need to add xor part of rot_column on in this case
+	case 1:					
 		key[0] = prew_key[0] ^ key[0];
-		key[1] = prew_key[1] ^ key[1];
-		key[2] = prew_key[2] ^ key[2];
-		key[3] = prew_key[3] ^ key[3];
+		switch (round_number)
+		{
+		case 1:
+			key[0] ^= 0x01;
+		case 2:
+			key[0] ^= 0x02;
+		case 3:
+			key[0] ^= 0x04;
+		case 4:
+			key[0] ^= 0x08;
+		case 5:
+			key[0] ^= 0x10;
+		case 6:
+			key[0] ^= 0x20;
+		case 7:
+			key[0] ^= 0x40;
+		case 8:
+			key[0] ^= 0x80;
+		case 9:
+			key[0] ^= 0x1B;
+		case 10:
+			key[0] ^= 0x36;
+
+		};
+		key[1] = prew_key[1] ^ key[1] ^ 0x00;
+		key[2] = prew_key[2] ^ key[2] ^ 0X00;
+		key[3] = prew_key[3] ^ key[3] ^ 0x00;
 	case 2:
 		key[4] = prew_key[4] ^ key[0];
 		key[5] = prew_key[5] ^ key[1];
