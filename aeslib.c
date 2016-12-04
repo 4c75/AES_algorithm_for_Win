@@ -64,14 +64,14 @@ void SubBtyes(char *state)
 // pass array of 16 elements
 void ShiftRows(char *state)
 {
-    int row = 1, col = 1;
+    int col, row = 0;
     for(; row<4; row++)
 	{
         char remember = state[row *4+ 0];
-        for(1; col<4; col++){
+        for(col = 1; col<4; col++){
             state[row *4+ (col-1)] = state[row *4+ col];
 		};
-		state[row*4 + 3] = remember;
+		state[row *4+ 3] = remember;
 	};
 };
 
