@@ -84,27 +84,56 @@ void MixColumns(char *state)
 void Rot_Word(char* word)
 {
 	char* temp;
-	temp = word[1];
-	word[1] = word[4];
-	word[4] = temp;
-	temp = word[2];
-	word[2] = word[3];
+	temp = word[0];
+	word[0] = word[3];
 	word[3] = temp;
+	temp = word[1];
+	word[1] = word[2];
+	word[2] = temp;
+};
+
+void XOR_column(char* prew_key, char* key, int column)
+{
+	//need to add another table, which will be added as another xor?   Rcon?
+	switch (column)
+	{
+	case 1:					//Need to add xor part of rot_column
+		key[0] = prew_key[0] ^ key[0];
+		key[1] = prew_key[1] ^ key[1];
+		key[2] = prew_key[2] ^ key[2];
+		key[3] = prew_key[3] ^ key[3];
+	case 2:
+		key[4] = prew_key[4] ^ key[0];
+		key[5] = prew_key[5] ^ key[1];
+		key[6] = prew_key[6] ^ key[2];
+		key[7] = prew_key[7] ^ key[3];
+	case 3:
+		key[8] = prew_key[8] ^ key[4];
+		key[9] = prew_key[9] ^ key[5];
+		key[10] = prew_key[10] ^ key[6];
+		key[11] = prew_key[11] ^ key[7];
+	case 4:
+		key[12] = prew_key[12] ^ key[8];
+		key[13] = prew_key[13] ^ key[9];
+		key[14] = prew_key[14] ^ key[10];
+		key[15] = prew_key[15] ^ key[12];
+	}
 };
 
 void getRoundKey(char *key, char* round_key) //need to make round key generator
 {
 	char* temp;
-	//Take 4 elements from first key and do a 
-	temp[1] = key[11]; 
-	temp[2] = key[12];
-	temp[3] = key[13];
-	temp[4] = key[14];
-	Rot_Word(temp);
+	//Take 4 elements from first key (last column)
+	temp[0] = key[11]; 
+	temp[1] = key[12];
+	temp[2] = key[13];
+	temp[3] = key[14];
+	Rot_Word(temp);  //Rot_word and subbyte and rot_column only for first column
 	//subbyte
-
-	return;
-
+	XOR_column(key, round_key, 1);
+	XOR_column(key, round_key, 2);
+	XOR_column(key, round_key, 3);
+	XOR_column(key, round_key, 4);
 };
 
 void encrypt_AES(char *state, char* key)
