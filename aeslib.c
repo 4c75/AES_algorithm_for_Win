@@ -125,7 +125,7 @@ void MixColumns_inversed(char *state)
 
 void Rot_Word(char* word)
 {
-	char *temp="abc";
+	char temp[4];
 	temp[0] = word[0];
 	word[0] = word[1];
 	word[1] = word[2];
@@ -193,7 +193,7 @@ void XOR_column(char* prew_key, char* key, int column, int round_number, char * 
 
 void getRoundKey(char *key, char* round_key, int round_number)
 {
-	char *temp="abc";
+	char temp[4];
 	//Take 4 elements from first key (last column)
 	temp[0] = key[12]; 
 	temp[1] = key[13];
