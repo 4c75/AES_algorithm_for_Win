@@ -88,8 +88,6 @@ void ShiftRows_inversed(char *state)
 	};
 };
 
-
-
 void MixColumns(char *state)  
 {
 	/*
@@ -107,8 +105,6 @@ void MixColumns(char *state)
 		state[i + 3] = 0x03 * state[i] ^ 0x01 * state[i + 4] ^ 0x01 * state[i + 8] ^ 0x02 * state[i + 12];
 	};
 };
-
-
 
 void MixColumns_inversed(char *state)
 {
@@ -146,8 +142,6 @@ void Rot_Word(char* word)
 */
 void XOR_column(char* prew_key, char* key, int column, int round_number, char * temp)
 {
-	//need to add another table, which will be added as another xor?   Rcon?
-	//10x4   use 1 column in each round key (first round, first column...)
 	char * vertiba;
 	switch (column)
 	{
@@ -205,7 +199,7 @@ void getRoundKey(char *key, char* round_key, int round_number)
 	temp[1] = key[13];
 	temp[2] = key[14];
 	temp[3] = key[15];
-	Rot_Word(temp);  //Rot_word and subbyte
+	Rot_Word(temp);  //Rot_word and subbytes only for first column
 	//subbyte need to add!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	XOR_column(key, round_key, 1, round_number, temp);  //will use temp file only for 1 column key generation
 	XOR_column(key, round_key, 2, round_number, temp);
