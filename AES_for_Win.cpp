@@ -48,6 +48,13 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout << text_fragment << endl;
 		decrypt_AES(text_fragment, key);
 		cout << text_fragment << endl;
+
+		/*cout << text_fragment << endl;
+		ShiftRows(text_fragment);
+		cout << text_fragment << endl;
+		ShiftRows_inversed(text_fragment);
+		cout << text_fragment << endl << endl<<endl;*/
+
 	};
 
 	system("pause");
