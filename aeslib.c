@@ -127,10 +127,10 @@ void Rot_Word(char* word)
 {
 	char temp[4];
 	temp[0] = word[0];
-	word[0] = word[1];
-	word[1] = word[2];
-	word[2] = word[3];
-	word[3] = temp[0];
+	word[0] = word[3];
+	word[3] = word[2];
+	word[2] = word[1];
+	word[1] = temp[0];
 };
 
 
@@ -215,8 +215,8 @@ void encrypt_AES(char *state, char* key)
 	prew_round_key = key;
 	round_key = key;
 	for(int i=0; i<9 ;i++){
-        SubBtyes(state); //will need to check
-        ShiftRows(state); //will need to check
+        SubBtyes(state); 
+        ShiftRows(state); 
         MixColumns(state);
 		getRoundKey(prew_round_key, round_key, i);
         AddRoundKey(state, round_key);
