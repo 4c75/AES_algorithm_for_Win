@@ -129,7 +129,7 @@ void MixColumns_inversed(char *state)
 
 void Rot_Word(char* word)
 {
-	char temp[2];
+	char *temp="abc";
 	temp[0] = word[0];
 	word[0] = word[1];
 	word[1] = word[2];
@@ -144,7 +144,7 @@ void Rot_Word(char* word)
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 */
-void XOR_column(char* prew_key, char* key, int column, int round_number)
+void XOR_column(char* prew_key, char* key, int column, int round_number, char * temp)
 {
 	//need to add another table, which will be added as another xor?   Rcon?
 	//10x4   use 1 column in each round key (first round, first column...)
@@ -152,34 +152,33 @@ void XOR_column(char* prew_key, char* key, int column, int round_number)
 	switch (column)
 	{
 	case 1:					
-		key[0] = prew_key[0] ^ key[0];
+		key[0] = prew_key[0] ^ temp[0];
 		switch (round_number)
 		{
 		case 1:
-			key[0] ^= 0x01;
+			temp[0] ^= 0x01;
 		case 2:
-			key[0] ^= 0x02;
+			temp[0] ^= 0x02;
 		case 3:
-			key[0] ^= 0x04;
+			temp[0] ^= 0x04;
 		case 4:
-			key[0] ^= 0x08;
+			temp[0] ^= 0x08;
 		case 5:
-			key[0] ^= 0x10;
+			temp[0] ^= 0x10;
 		case 6:
-			key[0] ^= 0x20;
+			temp[0] ^= 0x20;
 		case 7:
-			key[0] ^= 0x40;
+			temp[0] ^= 0x40;
 		case 8:
-			key[0] ^= 0x80;
+			temp[0] ^= 0x80;
 		case 9:
-			key[0] ^= 0x1B;
+			temp[0] ^= 0x1B;
 		case 10:
-			key[0] ^= 0x36;
-
+			temp[0] ^= 0x36;
 		};
-		key[1] = prew_key[1] ^ key[1] ^ 0x00;
-		key[2] = prew_key[2] ^ key[2] ^ 0X00;
-		key[3] = prew_key[3] ^ key[3] ^ 0x00;
+		key[1] = prew_key[1] ^ temp[1] ^ 0x00;
+		key[2] = prew_key[2] ^ temp[2] ^ 0X00;
+		key[3] = prew_key[3] ^ temp[3] ^ 0x00;
 	case 2:
 		key[4] = prew_key[4] ^ key[0];
 		key[5] = prew_key[5] ^ key[1];
@@ -200,18 +199,18 @@ void XOR_column(char* prew_key, char* key, int column, int round_number)
 
 void getRoundKey(char *key, char* round_key, int round_number)
 {
-	char temp[]="1234";
+	char *temp="abc";
 	//Take 4 elements from first key (last column)
-	temp[0] = key[11]; 
-	temp[1] = key[12];
-	temp[2] = key[13];
-	temp[3] = key[14];
-	Rot_Word(temp);  //Rot_word and subbyte and rot_column only for first column
-	//subbyte need to add
-	XOR_column(key, round_key, 1, round_number);
-	XOR_column(key, round_key, 2, round_number);
-	XOR_column(key, round_key, 3, round_number);
-	XOR_column(key, round_key, 4, round_number);
+	temp[0] = key[12]; 
+	temp[1] = key[13];
+	temp[2] = key[14];
+	temp[3] = key[15];
+	Rot_Word(temp);  //Rot_word and subbyte
+	//subbyte need to add!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	XOR_column(key, round_key, 1, round_number, temp);  //will use temp file only for 1 column key generation
+	XOR_column(key, round_key, 2, round_number, temp);
+	XOR_column(key, round_key, 3, round_number, temp);
+	XOR_column(key, round_key, 4, round_number, temp);
 };
 
 void encrypt_AES(char *state, char* key)
@@ -248,7 +247,7 @@ void decrypt_AES(char * state, char *key)
 		SubBtyes(state); //need to make inverse
 		getRoundKey(prew_round_key, round_key, i);	//the question is should this go from 1 to 10 or from 10 to 1
 		AddRoundKey(state, round_key);
-		MixColumns(state); //inverse
+		MixColumns_inversed(state); //need to check?
 		prew_round_key =round_key;
 	};
 	ShiftRows_inversed(state);
