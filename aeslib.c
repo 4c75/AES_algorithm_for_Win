@@ -77,11 +77,11 @@ void ShiftRows(char *state)
 
 void ShiftRows_inversed(char *state)
 {
-	int row = 1, col = 2;
+	int col, row = 0;
 	for (; row<4; row++)
 	{
 		char remember = state[row * 4 + 3];
-		for (; col<1; col--){
+		for (col = 2; col>-1; col--){
 			state[row * 4 + (col + 1)] = state[row * 4 + col];
 		};
 		state[row * 4 + 0] = remember;
