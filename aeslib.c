@@ -240,7 +240,6 @@ void decrypt_AES(char * state, char *key)
 		ShiftRows_inversed(state); // -> IS_IS correct?  need to make inverse
 		SubBtyes(state); //need to make inverse
 		getRoundKey(prew_round_key, round_key, i);	//the question is should this go from 1 to 10 or from 10 to 1
-		//most likely from 10 to 1
 		AddRoundKey(state, round_key);
 		MixColumns_inversed(state); //need to check?
 		prew_round_key =round_key;
