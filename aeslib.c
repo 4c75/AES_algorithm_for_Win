@@ -3,6 +3,7 @@
 //https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 //https://www.lri.fr/~fmartignon/documenti/systemesecurite/5-AES.pdf
 
+unsigned char round_keys[16 * 10];
 
 static unsigned char Rijndael_S_box[256] =
  {
@@ -43,7 +44,6 @@ static unsigned char Rijndael_S_box_reversed[256] =
   0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
   0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
 };
-
 
 void AddRoundKey(unsigned char *state, unsigned char *round_key)
 {
@@ -98,99 +98,56 @@ void ShiftRows_inversed(unsigned char *state)
 
 unsigned char xtime(unsigned char x)
 {
-  //return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
+  return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
 }
 
-
-void MixColumns(unsigned char *state)
-{
-  /*int i;
-  unsigned char Tmp,Tm,t;
-  for(i = 0; i < 4; ++i)
-  {
-    t = state[i*4+0];
-    Tmp = state[i*4+0] ^ state[i*4+1] ^ state[i*4+2] ^ state[i*4+3];
-    Tm = state[i*4+0] ^ state[i*4+1];
-    Tm = xtime(Tm);
-    state[i*4+0] ^= Tm ^ Tmp;
-    Tm = state[i*4+1] ^ state[i*4+2];
-    Tm = xtime(Tm);
-    state[i*4+1] ^= Tm ^ Tmp;
-    Tm = state[i*4+2] ^ state[i*4+3];
-    Tm = xtime(Tm);
-    state[i*4+2] ^= Tm ^ Tmp;
-    Tm = state[i*4+3] ^ t;
-    Tm = xtime(Tm);
-    state[i*4+3] ^= Tm ^ Tmp;
-  }*/
-}
-
-int Multiply(int x, int y)
+int Multiply(int y, int x)
 {
   return (((y & 1) * x) ^
        ((y>>1 & 1) * xtime(x)) ^
        ((y>>2 & 1) * xtime(xtime(x))) ^
        ((y>>3 & 1) * xtime(xtime(xtime(x)))) ^
        ((y>>4 & 1) * xtime(xtime(xtime(xtime(x))))));
-  }
+};
 
+
+/*
+02 03 01 01
+01 02 03 01
+03 01 01 02
+*/
+void MixColumns(unsigned char *state)
+{
+  char tmp[16];
+	for (int i = 0; i < 16; i+=4)
+	{
+		tmp[i] = Multiply(0x02, state[i]) ^ Multiply(0x03, state[i + 1]) ^ Multiply(0x01, state[i + 2]) ^ Multiply(0x01, state[i + 3]);	//XOR counted as +
+		tmp[i + 1] = Multiply(0x01, state[i]) ^ Multiply(0x02, state[i + 1]) ^ Multiply(0x03, state[i + 2]) ^ Multiply(0x01, state[i + 3]);
+		tmp[i + 2] = Multiply(0x01, state[i]) ^ Multiply(0x01, state[i + 1]) ^ Multiply(0x02, state[i + 2]) ^ Multiply(0x03, state[i + 3]);
+		tmp[i + 3] = Multiply(0x03, state[i]) ^ Multiply(0x01, state[i + 1]) ^ Multiply(0x01, state[i + 2]) ^ Multiply(0x02, state[i + 3]);
+	};
+  for(int i = 0; i<16; i++) state[i] = tmp[i];
+};
+
+/*
+0E 0B 0D 09
+09 0E 0B 0D
+0D 09 0E 0B
+0B 0D 09 0E
+*/
 void MixColumns_inversed(unsigned char *state)
 {
-  /*int i;
-  int a,b,c,d;
-  for(i=0;i<4;++i)
-  {
-    a = state[i*4+0];
-    b = state[i*4+1];
-    c = state[i*4+2];
-    d = state[i*4+3];
-
-    state[i*4+0] = Multiply(a, 0x0e) ^ Multiply(b, 0x0b) ^ Multiply(c, 0x0d) ^ Multiply(d, 0x09);
-    state[i*4+1] = Multiply(a, 0x09) ^ Multiply(b, 0x0e) ^ Multiply(c, 0x0b) ^ Multiply(d, 0x0d);
-    state[i*4+2] = Multiply(a, 0x0d) ^ Multiply(b, 0x09) ^ Multiply(c, 0x0e) ^ Multiply(d, 0x0b);
-    state[i*4+3] = Multiply(a, 0x0b) ^ Multiply(b, 0x0d) ^ Multiply(c, 0x09) ^ Multiply(d, 0x0e);
-  }*/
-}
-
-/*void MixColumns(unsigned char *state)
-{
-	/*
-	02 03 01 01
-	01 02 03 01
-	03 01 01 02
-
   int i;
   char tmp[16];
 	for (i = 0; i < 16; i+=4)
 	{
-  01 01 02 03
-		tmp[i] = 0x02 * state[i] ^ 0x03 * state[i + 1] ^ 0x01 * state[i + 2] ^ 0x01 * state[i + 3];	//XOR counted as +
-		tmp[i + 1] = 0x01 * state[i] ^ 0x02 * state[i + 1] ^ 0x03 * state[i + 2] ^ 0x01 * state[i + 3];
-		tmp[i + 2] = 0x01 * state[i] ^ 0x01 * state[i + 1] ^ 0x02 * state[i + 2] ^ 0x03 * state[i + 3];
-		tmp[i + 3] = 0x03 * state[i] ^ 0x01 * state[i + 1] ^ 0x01 * state[i + 2] ^ 0x02 * state[i + 3];
-	};
-  for(i = 0; i<16; i++) state[i] = tmp[i];
-};*/
-
-/*void MixColumns_inversed(unsigned char *state)
-{
-	/*
-	0E 0B 0D 09
-	09 0E 0B 0D
-	0D 09 0E 0B
-	0B 0D 09 0E
-
-  int i;
-  char tmp[16];
-	for (i = 0; i < 16; i+=4)
-	{
-		state[i] = (0x0E * state[i]) ^ (0x0B * state[i + 1]) ^ (0x0D * state[i + 2]) ^ (0x09 * state[i + 3]);
-		state[i + 1] = (0x09 * state[i]) ^ (0x0E * state[i + 1]) ^ (0x0B * state[i + 2]) ^ (0x0D * state[i + 3]);
-		state[i + 2] = (0x0D * state[i]) ^ (0x09 * state[i + 1]) ^ (0x0E * state[i + 2]) ^ (0x0B * state[i + 3]);
-		state[i + 3] = (0x0B * state[i]) ^ (0x0D * state[i + 1]) ^ (0x09 * state[i + 2]) ^ (0x0E * state[i + 3]);
+		tmp[i] = Multiply(0x0E, state[i]) ^ Multiply(0x0B, state[i + 1]) ^ Multiply(0x0D, state[i + 2]) ^ Multiply(0x09, state[i + 3]);
+		tmp[i + 1] = Multiply(0x09, state[i]) ^ Multiply(0x0E, state[i + 1]) ^ Multiply(0x0B, state[i + 2]) ^ Multiply(0x0D, state[i + 3]);
+		tmp[i + 2] = Multiply(0x0D, state[i]) ^ Multiply(0x09, state[i + 1]) ^ Multiply(0x0E, state[i + 2]) ^ Multiply(0x0B, state[i + 3]);
+		tmp[i + 3] = Multiply(0x0B, state[i]) ^ Multiply(0x0D, state[i + 1]) ^ Multiply(0x09, state[i + 2]) ^ Multiply(0x0E, state[i + 3]);
 	};
   for(i=0; i<16; i++) state[i] = tmp[i];
-};*/
+};
 
 void Rot_Word(unsigned char* word)
 {
@@ -202,13 +159,13 @@ void Rot_Word(unsigned char* word)
 	word[1] = temp[0];
 };
 
-
 /*	RCON
 [01]  [02]  [04]  [08]  [10]  [20]  [40]  [80]  [1b]  [36]
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 */
+
 void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int round_number, unsigned char * temp)
 {
 	unsigned char * vertiba;
@@ -276,8 +233,6 @@ void getRoundKey(unsigned char *key, unsigned char* round_key, int round_number)
 	XOR_column(key, round_key, 4, round_number, temp);
 };
 
-unsigned char round_keys[16*10];
-
 void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_number)
 {
   int i;
@@ -298,11 +253,11 @@ void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_
     round_number ++;
 
     int j;
-    for(j=0; j<16; j++){
+    for(j=0; j<16; j++)
+	{
       round_keys[i *16+ j] = round_key[j];
       key[j]=round_key[j];
     }
-
   }
 };
 
@@ -317,13 +272,13 @@ void encrypt_AES(unsigned char *state, unsigned char* key)
         SubBtyes(state, 16);
         ShiftRows(state);
         //MixColumns(state);
-		    getRoundKey(prew_round_key, round_key, i);
+		getRoundKey(prew_round_key, round_key, i);
         AddRoundKey(state, round_key);
 		prew_round_key = round_key;
 	};
     SubBtyes(state, 16);
     ShiftRows(state);
-	  getRoundKey(prew_round_key, round_key, 10);
+	getRoundKey(prew_round_key, round_key, 10);
     AddRoundKey(prew_round_key, round_key);
 };
 
@@ -331,33 +286,33 @@ void decrypt_AES(unsigned char * state, unsigned char *key)
 {
 	unsigned char *round_key;
 	unsigned char *prew_round_key;
-	AddRoundKey(state, key);
 	prew_round_key = key;
 	round_key = key;
-  getRoundKey10Times(prew_round_key, round_key, 1);
-	for (int i = 9; i>0; i--) {
+    getRoundKey10Times(prew_round_key, round_key, 1);
+	for (int df = 0; df<16; df++)
+	{
+		round_key[df] = round_keys[9 * 16 + df];
+	}
+	AddRoundKey(state, round_key);
 
+	for (int i = 9; i>0; i--) 
+	{
 		ShiftRows_inversed(state);
 		SubBtyes_inversed(state, 16);
-
-    int df;
-    //round_key = round_keys[i];
-    for(df = 0; df<16; df++){
-      round_key[df] = round_keys[i*16 + df];
-    }
-
-
-    //getRoundKey(prew_round_key, round_key, i);	//the question is should this go from 1 to 10 or from 10 to 1
+		for(int df = 0; df<16; df++)
+		{
+			round_key[df] = round_keys[i*16 + df];
+		}
+		getRoundKey(prew_round_key, round_key, i);	//the question is should this go from 1 to 10 or from 10 to 1
 		AddRoundKey(state, round_key);
 		//MixColumns_inversed(state); //need to check?
 		prew_round_key =round_key;
 	};
 	ShiftRows_inversed(state);
 	SubBtyes_inversed(state, 16);
-  int df;
-  for(df = 0; df<16; df++){
-    round_key[df] = round_keys[9*16 + df];
-  }
-  //getRoundKey(prew_round_key, round_key, 10);
+	for(int df = 0; df<16; df++)
+	{
+    round_key[df] = round_keys[0*16 + df];
+	}
 	AddRoundKey(state, round_key);
 };
