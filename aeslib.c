@@ -3,7 +3,7 @@
 //https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 //https://www.lri.fr/~fmartignon/documenti/systemesecurite/5-AES.pdf
 
-unsigned char round_keys[16 * 10];
+//unsigned unsigned char round_keys[10 * 16];
 
 static unsigned char Rijndael_S_box[256] =
  {
@@ -49,7 +49,7 @@ void AddRoundKey(unsigned char *state, unsigned char *round_key)
 {
     for(int i=0; i < 16; i++)
 	{
-        state[i] = state [i] ^ round_key[i];
+        state[i] = state [i] ^ round_key[i];	//XOR operation
 	};
 };
 
@@ -96,22 +96,22 @@ void ShiftRows_inversed(unsigned char *state)
 	};
 };
 
+//Used in function Multiply
 unsigned char xtime(unsigned char x)
 {
   return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
 }
 
-int Multiply(int y, int x)
+int Multiply(int x, int y)
 {
-  return (((y & 1) * x) ^
-       ((y>>1 & 1) * xtime(x)) ^
-       ((y>>2 & 1) * xtime(xtime(x))) ^
-       ((y>>3 & 1) * xtime(xtime(xtime(x)))) ^
-       ((y>>4 & 1) * xtime(xtime(xtime(xtime(x))))));
+  return (((x & 1) * y) ^
+       ((x>>1 & 1) * xtime(y)) ^
+       ((x>>2 & 1) * xtime(xtime(y))) ^
+       ((x>>3 & 1) * xtime(xtime(xtime(y)))) ^
+       ((x>>4 & 1) * xtime(xtime(xtime(xtime(y))))));
 };
 
-
-/*
+/*	These numbers are used as arguments in Mix Column,if change these then need to change inversed values too
 02 03 01 01
 01 02 03 01
 03 01 01 02
@@ -129,7 +129,7 @@ void MixColumns(unsigned char *state)
   for(int i = 0; i<16; i++) state[i] = tmp[i];
 };
 
-/*
+/*	Used for inversed function, if change these then need to change those who are in MixColumn too
 0E 0B 0D 09
 09 0E 0B 0D
 0D 09 0E 0B
@@ -165,58 +165,71 @@ void Rot_Word(unsigned char* word)
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]  [00]
 */
-
 void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int round_number, unsigned char * temp)
 {
-	unsigned char * vertiba;
 	switch (column)
 	{
 	case 1:
-		key[0] = prew_key[0] ^ temp[0];
+		key[0] = prew_key[0] ^ temp[0];	//AFTER THIS LINE PREW_KEY CHANGES VALUES AND I DONT KNOW WHY!!!
 		switch (round_number)
 		{
 		case 1:
-			temp[0] ^= 0x01;
+			key[0] ^= 0x01;	//Use values from RCON, only first numbers needs to be XOR'ed
+			break;
 		case 2:
-			temp[0] ^= 0x02;
+			key[0] ^= 0x02;
+			break;
 		case 3:
-			temp[0] ^= 0x04;
+			key[0] ^= 0x04;
+			break;
 		case 4:
-			temp[0] ^= 0x08;
+			key[0] ^= 0x08;
+			break;
 		case 5:
-			temp[0] ^= 0x10;
+			key[0] ^= 0x10;
+			break;
 		case 6:
-			temp[0] ^= 0x20;
+			key[0] ^= 0x20;
+			break;
 		case 7:
-			temp[0] ^= 0x40;
+			key[0] ^= 0x40;
+			break;
 		case 8:
-			temp[0] ^= 0x80;
+			key[0] ^= 0x80;
+			break;
 		case 9:
-			temp[0] ^= 0x1B;
+			key[0] ^= 0x1B;
+			break;
 		case 10:
-			temp[0] ^= 0x36;
+			key[0] ^= 0x36;
+			break;
 		};
 		key[1] = prew_key[1] ^ temp[1] ^ 0x00;
 		key[2] = prew_key[2] ^ temp[2] ^ 0X00;
 		key[3] = prew_key[3] ^ temp[3] ^ 0x00;
+		break;
 	case 2:
 		key[4] = prew_key[4] ^ key[0];
 		key[5] = prew_key[5] ^ key[1];
 		key[6] = prew_key[6] ^ key[2];
 		key[7] = prew_key[7] ^ key[3];
+		break;
 	case 3:
 		key[8] = prew_key[8] ^ key[4];
 		key[9] = prew_key[9] ^ key[5];
 		key[10] = prew_key[10] ^ key[6];
 		key[11] = prew_key[11] ^ key[7];
+		break;
 	case 4:
 		key[12] = prew_key[12] ^ key[8];
 		key[13] = prew_key[13] ^ key[9];
 		key[14] = prew_key[14] ^ key[10];
 		key[15] = prew_key[15] ^ key[12];
+		break;
 	}
 };
 
+/*	Used this to generate 1 key at time
 void getRoundKey(unsigned char *key, unsigned char* round_key, int round_number)
 {
 	unsigned char temp[4];
@@ -232,11 +245,14 @@ void getRoundKey(unsigned char *key, unsigned char* round_key, int round_number)
 	XOR_column(key, round_key, 3, round_number, temp);
 	XOR_column(key, round_key, 4, round_number, temp);
 };
+*/
 
-void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_number)
+void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_number, unsigned char* round_keys)
 {
   int i;
-  for(i =0; i<10; i++){
+  int round = round_number;
+  for(i =0; i<10; i++)
+  {
     unsigned char temp[4];
   	//Take 4 elements from first key (last column)
   	temp[0] = key[12];
@@ -245,40 +261,48 @@ void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_
   	temp[3] = key[15];
   	Rot_Word(temp);  //Rot_word and subbytes only for first column
   	SubBtyes(temp, 4);
-  	XOR_column(key, round_key, 1, round_number, temp);  //will use temp file only for 1 column key generation
-  	XOR_column(key, round_key, 2, round_number, temp);
-  	XOR_column(key, round_key, 3, round_number, temp);
-  	XOR_column(key, round_key, 4, round_number, temp);
+  	XOR_column(key, round_key, 1, round, temp);  //will use temp file only for 1 column key generation
+  	XOR_column(key, round_key, 2, round, temp);
+  	XOR_column(key, round_key, 3, round, temp);
+  	XOR_column(key, round_key, 4, round, temp);
 
-    round_number ++;
+	round++;
 
     int j;
     for(j=0; j<16; j++)
 	{
       round_keys[i *16+ j] = round_key[j];
       key[j]=round_key[j];
+	  
     }
-  }
+  };
 };
 
 void encrypt_AES(unsigned char *state, unsigned char* key)
 {
 	unsigned char *round_key;
 	unsigned char *prew_round_key;
+	unsigned unsigned char round_keys[10 * 16];
 	AddRoundKey(state, key);
 	prew_round_key = key;
 	round_key = key;
-	for(int i=1; i<=9 ;i++){
+	getRoundKey10Times(prew_round_key, round_key, 1, round_keys);
+	for(int i=0; i<9 ;i++){
         SubBtyes(state, 16);
         ShiftRows(state);
-        //MixColumns(state);
-		getRoundKey(prew_round_key, round_key, i);
+        MixColumns(state);
+		for (int df = 0; df<16; df++)
+		{
+			round_key[df] = round_keys[i * 16 + df];
+		}
         AddRoundKey(state, round_key);
-		prew_round_key = round_key;
 	};
     SubBtyes(state, 16);
     ShiftRows(state);
-	getRoundKey(prew_round_key, round_key, 10);
+	for (int df = 0; df<16; df++)
+	{
+		round_key[df] = round_keys[10 * 16 + df];
+	}
     AddRoundKey(prew_round_key, round_key);
 };
 
@@ -286,27 +310,25 @@ void decrypt_AES(unsigned char * state, unsigned char *key)
 {
 	unsigned char *round_key;
 	unsigned char *prew_round_key;
+	unsigned unsigned char round_keys[10 * 16];
 	prew_round_key = key;
 	round_key = key;
-    getRoundKey10Times(prew_round_key, round_key, 1);
+	getRoundKey10Times(prew_round_key, round_key, 1, round_keys);
 	for (int df = 0; df<16; df++)
 	{
-		round_key[df] = round_keys[9 * 16 + df];
+		round_key[df] = round_keys[10 * 16 + df];
 	}
 	AddRoundKey(state, round_key);
-
 	for (int i = 9; i>0; i--) 
 	{
 		ShiftRows_inversed(state);
 		SubBtyes_inversed(state, 16);
-		for(int df = 0; df<16; df++)
+		MixColumns_inversed(state);
+		for (int df = 0; df<16; df++)
 		{
-			round_key[df] = round_keys[i*16 + df];
+			round_key[df] = round_keys[i * 16 + df];
 		}
-		getRoundKey(prew_round_key, round_key, i);	//the question is should this go from 1 to 10 or from 10 to 1
 		AddRoundKey(state, round_key);
-		//MixColumns_inversed(state); //need to check?
-		prew_round_key =round_key;
 	};
 	ShiftRows_inversed(state);
 	SubBtyes_inversed(state, 16);

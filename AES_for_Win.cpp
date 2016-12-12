@@ -44,20 +44,16 @@ int main(int argc, char* argv[])
 			}
 			text_fragment[16] = '\0';
 		}
+		encrypt_AES(text_fragment, key);
 		//Puts together all result blocks
 		for (int j = 0; j <= 16; j++)
 		{
 			result[i+j] = text_fragment[j];
 		};
-
-		cout << text_fragment << endl;
-		MixColumns(text_fragment);
-		cout << text_fragment << endl;
-		MixColumns_inversed(text_fragment);
-		cout << text_fragment << endl;
+		
 	};
-	//cout << "Encrypted:" << endl;
-	//cout << result << endl;
+	cout << "Encrypted:" << endl;
+	cout << result << endl;
 	//Decrypts and puts result into string
 	for (int i = 0; i <= length_plain_text; i = i + 16)
 	{
@@ -65,14 +61,14 @@ int main(int argc, char* argv[])
 		{
 			text_fragment[j] = result[i + j];
 		};
-		//decrypt_AES(text_fragment, key);
+		decrypt_AES(text_fragment, key);
 		for (int j = 0; j <= 16; j++)
 		{
 			temp_result[i + j] = text_fragment[j];
 		};
 	};
-	//cout << "Decrypted:" << endl;	//SHOULD MAKE FUNCTION WHICH REMOVES ALL 0 FROM END OF STRING!!!!
-	//cout << temp_result << endl;
+	cout << "Decrypted:" << endl;	//SHOULD MAKE FUNCTION WHICH REMOVES ALL 0 FROM END OF STRING!!!!
+	cout << temp_result << endl;
 
 	/*cout << text_fragment << endl;
 	ShiftRows(text_fragment);
@@ -94,16 +90,6 @@ int main(int argc, char* argv[])
 	ShiftRows_inversed(text_fragment);
 	cout <<"after decryption: " << text_fragment<<endl<<endl;
 	*/
-
-	//rest of operations
-	/*
-	encrypt_AES(text_fragment, key);
-	cout << text_fragment << endl;
-	decrypt_AES(text_fragment, key);
-	cout << text_fragment << endl;
-	*/
-
-
 
 	system("pause");
 	return 0;
