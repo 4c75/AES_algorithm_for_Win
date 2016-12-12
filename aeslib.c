@@ -170,7 +170,7 @@ void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int rou
 	switch (column)
 	{
 	case 1:
-		key[0] = prew_key[0] ^ temp[0];	//AFTER THIS LINE PREW_KEY CHANGES VALUES AND I DONT KNOW WHY!!!
+		key[0] = prew_key[0] ^ temp[0];
 		switch (round_number)
 		{
 		case 1:
@@ -205,7 +205,7 @@ void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int rou
 			break;
 		};
 		key[1] = prew_key[1] ^ temp[1] ^ 0x00;
-		key[2] = prew_key[2] ^ temp[2] ^ 0X00;
+		key[2] = prew_key[2] ^ temp[2] ^ 0x00;	//ERROR AFTER THIS
 		key[3] = prew_key[3] ^ temp[3] ^ 0x00;
 		break;
 	case 2:
@@ -251,20 +251,26 @@ void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_
 {
   int i;
   int round = round_number;
+  unsigned char prew_round_key[17];
+  for (int i = 0; i <= 16; i++)
+  {
+	  prew_round_key[i] = key[i];
+  }
   for(i =0; i<10; i++)
   {
-    unsigned char temp[4];
+    unsigned char temp[5];
   	//Take 4 elements from first key (last column)
+	temp[4] = '\0';
   	temp[0] = key[12];
   	temp[1] = key[13];
   	temp[2] = key[14];
   	temp[3] = key[15];
   	Rot_Word(temp);  //Rot_word and subbytes only for first column
   	SubBtyes(temp, 4);
-  	XOR_column(key, round_key, 1, round, temp);  //will use temp file only for 1 column key generation
-  	XOR_column(key, round_key, 2, round, temp);
-  	XOR_column(key, round_key, 3, round, temp);
-  	XOR_column(key, round_key, 4, round, temp);
+  	XOR_column(prew_round_key, round_key, 1, round, temp);  //will use temp file only for 1 column key generation
+  	XOR_column(prew_round_key, round_key, 2, round, temp);
+  	XOR_column(prew_round_key, round_key, 3, round, temp);
+  	XOR_column(prew_round_key, round_key, 4, round, temp);
 
 	round++;
 
@@ -272,7 +278,7 @@ void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_
     for(j=0; j<16; j++)
 	{
       round_keys[i *16+ j] = round_key[j];
-      key[j]=round_key[j];
+	  prew_round_key[j]=round_key[j];
 	  
     }
   };
