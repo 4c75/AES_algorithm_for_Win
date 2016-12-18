@@ -1,7 +1,7 @@
 // AES_for_Win.cpp : Defines the entry point for the console application.
 //
 
-//#include <stdafx.h>
+#include "stdafx.h"
 #include <string.h>
 #include "aeslib.c"
 #include <iostream>
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 			text_fragment[16] = '\0';
 		}
 
-		cout <<"text fragment: "<< text_fragment<<endl;
+		/*cout <<"text fragment: "<< text_fragment<<endl;
 		ShiftRows(text_fragment);
 		SubBtyes(text_fragment,16);
 		AddRoundKey(text_fragment, key);
@@ -53,17 +53,17 @@ int main(int argc, char* argv[])
 		AddRoundKey(text_fragment, key);
 		SubBtyes_inversed(text_fragment,16);
 		ShiftRows_inversed(text_fragment);
-		cout <<"after decryption: " << text_fragment<<endl<<endl;
+		cout <<"after decryption: " << text_fragment<<endl<<endl;*/
 
 		//rest of operations
-	/*	encrypt_AES(text_fragment, key);
-		cout << text_fragment << endl;
+		encrypt_AES(text_fragment, key);
+		//cout << text_fragment << endl;
 		decrypt_AES(text_fragment, key);
 		cout << text_fragment << endl;
-*/
-	};
 
-	/*cout << text_fragment << endl;
+	};
+	/*
+	cout << text_fragment << endl;
 	ShiftRows(text_fragment);
 	cout << text_fragment << endl;
 	ShiftRows_inversed(text_fragment);
@@ -78,6 +78,6 @@ int main(int argc, char* argv[])
 
 
 
-	//system("pause");
+	system("pause");
 	return 0;
 }

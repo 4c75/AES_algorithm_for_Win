@@ -98,6 +98,7 @@ void ShiftRows_inversed(unsigned char *state)
 
 unsigned char xtime(unsigned char x)
 {
+	return 0;
   //return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
 }
 
@@ -260,6 +261,8 @@ void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int rou
 	}
 };
 
+unsigned char round_keys[10][16];
+
 void getRoundKey(unsigned char *key, unsigned char* round_key, int round_number)
 {
 	unsigned char temp[4];
@@ -276,10 +279,10 @@ void getRoundKey(unsigned char *key, unsigned char* round_key, int round_number)
 	XOR_column(key, round_key, 4, round_number, temp);
 };
 
-unsigned char round_keys[16*10];
 
-void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_number)
+void getRoundKey10Times(unsigned char *key, int round_number)
 {
+	unsigned char round_key[16];
   int i;
   for(i =0; i<10; i++){
     unsigned char temp[4];
@@ -298,66 +301,40 @@ void getRoundKey10Times(unsigned char *key, unsigned char* round_key, int round_
     round_number ++;
 
     int j;
-    for(j=0; j<16; j++){
-      round_keys[i *16+ j] = round_key[j];
-      key[j]=round_key[j];
+    for(j=0; j<16; j++)
+	{
+      round_keys[i][j] = round_key[j];
     }
-
   }
 };
 
 void encrypt_AES(unsigned char *state, unsigned char* key)
 {
+	getRoundKey10Times(key, 1);
 	unsigned char *round_key;
 	unsigned char *prew_round_key;
 	AddRoundKey(state, key);
-	prew_round_key = key;
-	round_key = key;
 	for(int i=1; i<=9 ;i++){
         SubBtyes(state, 16);
         ShiftRows(state);
-        //MixColumns(state);
-		    getRoundKey(prew_round_key, round_key, i);
-        AddRoundKey(state, round_key);
-		prew_round_key = round_key;
+        MixColumns(state);
+        AddRoundKey(state, round_keys[i]);
 	};
     SubBtyes(state, 16);
     ShiftRows(state);
-	  getRoundKey(prew_round_key, round_key, 10);
-    AddRoundKey(prew_round_key, round_key);
 };
 
 void decrypt_AES(unsigned char * state, unsigned char *key)
 {
+	getRoundKey10Times(key, 1);
 	unsigned char *round_key;
-	unsigned char *prew_round_key;
-	AddRoundKey(state, key);
-	prew_round_key = key;
-	round_key = key;
-  getRoundKey10Times(prew_round_key, round_key, 1);
 	for (int i = 9; i>0; i--) {
-
-		ShiftRows_inversed(state);
 		SubBtyes_inversed(state, 16);
-
-    int df;
-    //round_key = round_keys[i];
-    for(df = 0; df<16; df++){
-      round_key[df] = round_keys[i*16 + df];
-    }
-
-
-    //getRoundKey(prew_round_key, round_key, i);	//the question is should this go from 1 to 10 or from 10 to 1
-		AddRoundKey(state, round_key);
-		//MixColumns_inversed(state); //need to check?
-		prew_round_key =round_key;
+		ShiftRows_inversed(state);
+		MixColumns_inversed(state); //need to check?
+		AddRoundKey(state, round_keys[i]);
 	};
 	ShiftRows_inversed(state);
 	SubBtyes_inversed(state, 16);
-  int df;
-  for(df = 0; df<16; df++){
-    round_key[df] = round_keys[9*16 + df];
-  }
-  //getRoundKey(prew_round_key, round_key, 10);
-	AddRoundKey(state, round_key);
+	AddRoundKey(state, key);
 };
