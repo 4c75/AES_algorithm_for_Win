@@ -157,7 +157,7 @@ void MixColumns_inversed(unsigned char *state)
 01 02 03 01
 03 01 01 02
 */
-void MixColumns_E(unsigned char *state)
+/*void MixColumns_E(unsigned char *state)
 {
 	char tmp[16];
 	for (int i = 0; i < 16; i += 4)
@@ -168,7 +168,7 @@ void MixColumns_E(unsigned char *state)
 		tmp[i + 3] = Multiply(0x03, state[i]) ^ Multiply(0x01, state[i + 1]) ^ Multiply(0x01, state[i + 2]) ^ Multiply(0x02, state[i + 3]);
 	};
 	for (int i = 0; i<16; i++) state[i] = tmp[i];
-};
+};*/
 
 /*	Used for inversed function, if change these then need to change those who are in MixColumn too
 0E 0B 0D 09
@@ -176,7 +176,7 @@ void MixColumns_E(unsigned char *state)
 0D 09 0E 0B
 0B 0D 09 0E
 */
-void MixColumns_inversed_E(unsigned char *state)
+/*void MixColumns_inversed_E(unsigned char *state)
 {
 	int i;
 	char tmp[16];
@@ -188,7 +188,7 @@ void MixColumns_inversed_E(unsigned char *state)
 		tmp[i + 3] = Multiply(0x0B, state[i]) ^ Multiply(0x0D, state[i + 1]) ^ Multiply(0x09, state[i + 2]) ^ Multiply(0x0E, state[i + 3]);
 	};
 	for (i = 0; i<16; i++) state[i] = tmp[i];
-};
+};*/
 
 void Rot_Word(unsigned char* word)
 {
@@ -215,26 +215,26 @@ void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int rou
 		key[0] = prew_key[0] ^ temp[0];
 		switch (round_number)
 		{
-		case 1:
-			temp[0] ^= 0x01;
+		case 1: //was temp
+			key[0] ^= 0x01;
 		case 2:
-			temp[0] ^= 0x02;
+			key[0] ^= 0x02;
 		case 3:
-			temp[0] ^= 0x04;
+			key[0] ^= 0x04;
 		case 4:
-			temp[0] ^= 0x08;
+			key[0] ^= 0x08;
 		case 5:
-			temp[0] ^= 0x10;
+			key[0] ^= 0x10;
 		case 6:
-			temp[0] ^= 0x20;
+			key[0] ^= 0x20;
 		case 7:
-			temp[0] ^= 0x40;
+			key[0] ^= 0x40;
 		case 8:
-			temp[0] ^= 0x80;
+			key[0] ^= 0x80;
 		case 9:
-			temp[0] ^= 0x1B;
+			key[0] ^= 0x1B;
 		case 10:
-			temp[0] ^= 0x36;
+			key[0] ^= 0x24;
 		};
 		key[1] = prew_key[1] ^ temp[1] ^ 0x00;
 		key[2] = prew_key[2] ^ temp[2] ^ 0X00;
@@ -253,7 +253,7 @@ void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int rou
 		key[12] = prew_key[12] ^ key[8];
 		key[13] = prew_key[13] ^ key[9];
 		key[14] = prew_key[14] ^ key[10];
-		key[15] = prew_key[15] ^ key[12];
+		key[15] = prew_key[15] ^ key[11];
 	}
 };
 
@@ -283,10 +283,10 @@ void getRoundKey10Times(unsigned char *key, int round_number)
   for(i =0; i<10; i++){
     unsigned char temp[4];
   	//Take 4 elements from first key (last column)
-  	temp[0] = key[12];
-  	temp[1] = key[13];
-  	temp[2] = key[14];
-  	temp[3] = key[15];
+  	temp[0] = key[3]; //12
+  	temp[1] = key[7]; //13
+  	temp[2] = key[12]; //14
+  	temp[3] = key[15]; //15
   	Rot_Word(temp);  //Rot_word and subbytes only for first column
   	SubBtyes(temp, 4);
   	XOR_column(key, round_key, 1, round_number, temp);  //will use temp file only for 1 column key generation
