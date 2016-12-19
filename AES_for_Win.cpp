@@ -1,5 +1,9 @@
 // AES_for_Win.cpp : Defines the entry point for the console application.
-//
+// test results (time spent):
+// 1 000 000 times with 16 Bytes: 40.1 s
+// 10 000 times with 16 Bytes: 3.9 s
+// 1 time with 16 Bytes: 0.003 s
+// 10 000 times with 32 Bytes: 5.2 s
 
 //#include "stdafx.h"
 #include <string.h>
