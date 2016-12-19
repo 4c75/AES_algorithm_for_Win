@@ -5,18 +5,20 @@
 #include <string.h>
 #include "aeslib.c"
 #include <iostream>
+#include <fstream>
+#include <string>
 using namespace std;
 
 
 int main(int argc, char* argv[])
 {
-	char crypto_text[] = "Loti sarezgitais un sifretais teksts, kurs var but jebkada garuma";  //need to put option to insert different plain text
-	unsigned char key[] = "1234567891234567"; //need to put option to insert different key
-	unsigned char rezult[2000]; //assume the longest result will be 2000char long
-	unsigned char text_fragment [17]; //place to  hold plain text fragments 16 + end symbol
+
+	char crypto_text[] = "Loti sarezgitais un sifretais teksts, kurs var but jebkada garuma HOHO";
+	unsigned char key[] = "1234567891234567"; 
+	unsigned char text_fragment [17];
 	int length_plain_text=0;
 
-	length_plain_text = strlen(crypto_text); //need to get lenght of plain text
+	length_plain_text = strlen(crypto_text);
 	int last_block_starts = length_plain_text - (length_plain_text % 16);
 	int last_block_element_count = length_plain_text % 16;
 
@@ -39,44 +41,18 @@ int main(int argc, char* argv[])
 			}
 			for (int j = 0 + last_block_element_count; j <= 16; j++)
 			{
-				text_fragment[j] = '0';
+				text_fragment[j] = 0;
 			}
 			text_fragment[16] = '\0';
 		}
 
-		/*cout <<"text fragment: "<< text_fragment<<endl;
-		ShiftRows(text_fragment);
-		SubBtyes(text_fragment,16);
-		AddRoundKey(text_fragment, key);
-		cout <<"after cryption: "<< text_fragment<<endl;
-
-		AddRoundKey(text_fragment, key);
-		SubBtyes_inversed(text_fragment,16);
-		ShiftRows_inversed(text_fragment);
-		cout <<"after decryption: " << text_fragment<<endl<<endl;*/
-
-		//rest of operations
 		encrypt_AES(text_fragment, key);
-		//cout << text_fragment << endl;
+		//cout << "encrypted: "<< text_fragment << endl;
+
 		decrypt_AES(text_fragment, key);
-		cout << text_fragment << endl;
+		cout << "decrypted: " << text_fragment << endl;
 
 	};
-	/*
-	cout << text_fragment << endl;
-	ShiftRows(text_fragment);
-	cout << text_fragment << endl;
-	ShiftRows_inversed(text_fragment);
-	cout << text_fragment << endl;*/
-
-	/*cout << text_fragment << endl;
-	MixColumns(text_fragment);
-	cout << text_fragment << endl;
-	MixColumns_inversed(text_fragment);
-	cout << text_fragment << endl;*/
-
-
-
 
 	system("pause");
 	return 0;

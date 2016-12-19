@@ -98,14 +98,13 @@ void ShiftRows_inversed(unsigned char *state)
 
 unsigned char xtime(unsigned char x)
 {
-	return 0;
-  //return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
+  return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
 }
 
 
 void MixColumns(unsigned char *state)
 {
-  /*int i;
+  int i;
   unsigned char Tmp,Tm,t;
   for(i = 0; i < 4; ++i)
   {
@@ -123,7 +122,7 @@ void MixColumns(unsigned char *state)
     Tm = state[i*4+3] ^ t;
     Tm = xtime(Tm);
     state[i*4+3] ^= Tm ^ Tmp;
-  }*/
+  }
 }
 
 int Multiply(int x, int y)
@@ -137,7 +136,7 @@ int Multiply(int x, int y)
 
 void MixColumns_inversed(unsigned char *state)
 {
-  /*int i;
+  int i;
   int a,b,c,d;
   for(i=0;i<4;++i)
   {
@@ -150,48 +149,46 @@ void MixColumns_inversed(unsigned char *state)
     state[i*4+1] = Multiply(a, 0x09) ^ Multiply(b, 0x0e) ^ Multiply(c, 0x0b) ^ Multiply(d, 0x0d);
     state[i*4+2] = Multiply(a, 0x0d) ^ Multiply(b, 0x09) ^ Multiply(c, 0x0e) ^ Multiply(d, 0x0b);
     state[i*4+3] = Multiply(a, 0x0b) ^ Multiply(b, 0x0d) ^ Multiply(c, 0x09) ^ Multiply(d, 0x0e);
-  }*/
+  }
 }
 
-/*void MixColumns(unsigned char *state)
+/*	These numbers are used as arguments in Mix Column,if change these then need to change inversed values too
+02 03 01 01
+01 02 03 01
+03 01 01 02
+*/
+void MixColumns_E(unsigned char *state)
 {
-	/*
-	02 03 01 01
-	01 02 03 01
-	03 01 01 02
-
-  int i;
-  char tmp[16];
-	for (i = 0; i < 16; i+=4)
+	char tmp[16];
+	for (int i = 0; i < 16; i += 4)
 	{
-  01 01 02 03
-		tmp[i] = 0x02 * state[i] ^ 0x03 * state[i + 1] ^ 0x01 * state[i + 2] ^ 0x01 * state[i + 3];	//XOR counted as +
-		tmp[i + 1] = 0x01 * state[i] ^ 0x02 * state[i + 1] ^ 0x03 * state[i + 2] ^ 0x01 * state[i + 3];
-		tmp[i + 2] = 0x01 * state[i] ^ 0x01 * state[i + 1] ^ 0x02 * state[i + 2] ^ 0x03 * state[i + 3];
-		tmp[i + 3] = 0x03 * state[i] ^ 0x01 * state[i + 1] ^ 0x01 * state[i + 2] ^ 0x02 * state[i + 3];
+		tmp[i] = Multiply(0x02, state[i]) ^ Multiply(0x03, state[i + 1]) ^ Multiply(0x01, state[i + 2]) ^ Multiply(0x01, state[i + 3]);	//XOR counted as +
+		tmp[i + 1] = Multiply(0x01, state[i]) ^ Multiply(0x02, state[i + 1]) ^ Multiply(0x03, state[i + 2]) ^ Multiply(0x01, state[i + 3]);
+		tmp[i + 2] = Multiply(0x01, state[i]) ^ Multiply(0x01, state[i + 1]) ^ Multiply(0x02, state[i + 2]) ^ Multiply(0x03, state[i + 3]);
+		tmp[i + 3] = Multiply(0x03, state[i]) ^ Multiply(0x01, state[i + 1]) ^ Multiply(0x01, state[i + 2]) ^ Multiply(0x02, state[i + 3]);
 	};
-  for(i = 0; i<16; i++) state[i] = tmp[i];
-};*/
+	for (int i = 0; i<16; i++) state[i] = tmp[i];
+};
 
-/*void MixColumns_inversed(unsigned char *state)
+/*	Used for inversed function, if change these then need to change those who are in MixColumn too
+0E 0B 0D 09
+09 0E 0B 0D
+0D 09 0E 0B
+0B 0D 09 0E
+*/
+void MixColumns_inversed_E(unsigned char *state)
 {
-	/*
-	0E 0B 0D 09
-	09 0E 0B 0D
-	0D 09 0E 0B
-	0B 0D 09 0E
-
-  int i;
-  char tmp[16];
-	for (i = 0; i < 16; i+=4)
+	int i;
+	char tmp[16];
+	for (i = 0; i < 16; i += 4)
 	{
-		state[i] = (0x0E * state[i]) ^ (0x0B * state[i + 1]) ^ (0x0D * state[i + 2]) ^ (0x09 * state[i + 3]);
-		state[i + 1] = (0x09 * state[i]) ^ (0x0E * state[i + 1]) ^ (0x0B * state[i + 2]) ^ (0x0D * state[i + 3]);
-		state[i + 2] = (0x0D * state[i]) ^ (0x09 * state[i + 1]) ^ (0x0E * state[i + 2]) ^ (0x0B * state[i + 3]);
-		state[i + 3] = (0x0B * state[i]) ^ (0x0D * state[i + 1]) ^ (0x09 * state[i + 2]) ^ (0x0E * state[i + 3]);
+		tmp[i] = Multiply(0x0E, state[i]) ^ Multiply(0x0B, state[i + 1]) ^ Multiply(0x0D, state[i + 2]) ^ Multiply(0x09, state[i + 3]);
+		tmp[i + 1] = Multiply(0x09, state[i]) ^ Multiply(0x0E, state[i + 1]) ^ Multiply(0x0B, state[i + 2]) ^ Multiply(0x0D, state[i + 3]);
+		tmp[i + 2] = Multiply(0x0D, state[i]) ^ Multiply(0x09, state[i + 1]) ^ Multiply(0x0E, state[i + 2]) ^ Multiply(0x0B, state[i + 3]);
+		tmp[i + 3] = Multiply(0x0B, state[i]) ^ Multiply(0x0D, state[i + 1]) ^ Multiply(0x09, state[i + 2]) ^ Multiply(0x0E, state[i + 3]);
 	};
-  for(i=0; i<16; i++) state[i] = tmp[i];
-};*/
+	for (i = 0; i<16; i++) state[i] = tmp[i];
+};
 
 void Rot_Word(unsigned char* word)
 {
@@ -212,7 +209,6 @@ void Rot_Word(unsigned char* word)
 */
 void XOR_column(unsigned char* prew_key, unsigned char* key, int column, int round_number, unsigned char * temp)
 {
-	unsigned char * vertiba;
 	switch (column)
 	{
 	case 1:
@@ -311,8 +307,6 @@ void getRoundKey10Times(unsigned char *key, int round_number)
 void encrypt_AES(unsigned char *state, unsigned char* key)
 {
 	getRoundKey10Times(key, 1);
-	unsigned char *round_key;
-	unsigned char *prew_round_key;
 	AddRoundKey(state, key);
 	for(int i=1; i<=9 ;i++){
         SubBtyes(state, 16);
@@ -327,12 +321,11 @@ void encrypt_AES(unsigned char *state, unsigned char* key)
 void decrypt_AES(unsigned char * state, unsigned char *key)
 {
 	getRoundKey10Times(key, 1);
-	unsigned char *round_key;
 	for (int i = 9; i>0; i--) {
-		SubBtyes_inversed(state, 16);
 		ShiftRows_inversed(state);
-		MixColumns_inversed(state); //need to check?
+		SubBtyes_inversed(state, 16);
 		AddRoundKey(state, round_keys[i]);
+		MixColumns_inversed(state);
 	};
 	ShiftRows_inversed(state);
 	SubBtyes_inversed(state, 16);
