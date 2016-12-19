@@ -5,6 +5,15 @@
 // 1 time with 16 Bytes: 0.003 s
 // 10 000 times with 32 Bytes: 5.2 s
 
+//examples:
+//key: 1234567812345678
+//encrypted: 458F56F9ABA86D74589B3F299912D10C
+//decrypted: Merry Christmas
+
+//key: 0000000000000000
+//encrypted: 159ADD3DB5F6A4CDD8263814CD3B5C13
+//decrypted: HOHOHO
+
 //#include "stdafx.h"
 #include <string.h>
 #include "aeslib.c"
